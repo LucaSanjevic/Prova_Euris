@@ -1,11 +1,13 @@
 import { Component, signal } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router'; // Aggiungi questi due
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet],
-  templateUrl: './app.html',
-  styleUrl: './app.scss'
+  standalone: true,
+  templateUrl: './app.html', 
+  styleUrls: ['./app.scss'],
+  // Aggiungi RouterLink e RouterLinkActive qui sotto
+  imports: [RouterOutlet, RouterLink, RouterLinkActive] 
 })
 export class App {
   protected readonly title = signal('euris_test');
