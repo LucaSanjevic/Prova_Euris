@@ -9,9 +9,8 @@ import { ReviewModalComponent } from '../review-modal/review-modal';
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  templateUrl: './dashboard.html', // RIPRISTINA QUESTO
-  styleUrls: ['./dashboard.scss'], // RIPRISTINA QUESTO
-  // template: '...',             // CANCELLA QUESTO
+  templateUrl: './dashboard.html', 
+  styleUrls: ['./dashboard.scss'],
   imports: [
     CommonModule,
     ProductTableRowComponent,
