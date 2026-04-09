@@ -39,7 +39,7 @@ describe('ProductFormComponent', () => {
     expect(form.valid).toBe(true);
   });
 
-  it('should emit the correct data on save', () => {
+  it('should emit tsubmittedhe correct data on save', () => {
     let emitted = false;
     let receivedProduct: any = null;
 

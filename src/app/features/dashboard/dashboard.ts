@@ -11,7 +11,7 @@ import { ReviewModalComponent } from '../review-modal/review-modal';
   standalone: true,
   template: `<div class="container mt-4">
   <div class="d-flex justify-content-between align-items-center mb-4">
-    <h2 class="h4 mb-0 fw-bold">Gestione Store</h2>
+    <h2 class="h4 mb-0 fw-bold">Gestione Negozio</h2>
     <div class="d-flex gap-2">
       <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#productModal">
         <i class="bi bi-plus-lg me-2"></i>Nuovo Prodotto

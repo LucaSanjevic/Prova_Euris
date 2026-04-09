@@ -23,6 +23,7 @@ describe('ProductService', () => {
     httpMock.verify(); 
   });
 
+  // Test per la mappatura dei dati
   it('should map data correctly', () => {
     // Dati di test che simulano la risposta del server
     const mockResponse = [
@@ -41,6 +42,7 @@ describe('ProductService', () => {
     expect(service.products()[0].id).toBe('1');
   });
 
+  // Test per l'aggiunta di un prodotto e l'aggiornamento del signal
   it('should add a product (POST) and update the signal', () => {
     const newProductData = { data: { title: 'Nuovo', price: 20 } };
     // Simuliamo l'ID restituito dal server dopo la creazione del prodotto
@@ -58,6 +60,7 @@ describe('ProductService', () => {
     req.flush(mockId); 
   });
 
+  // Test per la cancellazione di un prodotto e l'aggiornamento del signal
   it('should delete a product (DELETE) and update the signal', () => {
     const productId = '123';
     
@@ -74,6 +77,7 @@ describe('ProductService', () => {
     expect(service.products().find(p => p.id === productId)).toBeUndefined();
   });
 
+  // Test per la gestione degli errori del server
   it('should handle 500 server error', () => {
     service.fetchProducts();
     const req = httpMock.expectOne(apiUrl);
