@@ -2,6 +2,7 @@ import { Component, OnInit, inject, ElementRef, ViewChild } from '@angular/core'
 import { Chart, registerables } from 'chart.js';
 import { ProductService } from '../../services/product.service';
 
+// Registriamo i componenti di Chart.js
 Chart.register(...registerables);
 
 @Component({
@@ -21,15 +22,14 @@ Chart.register(...registerables);
 export class ProductChartComponent implements OnInit {
   private productService = inject(ProductService);
   
-  // Usiamo un nome più semplice per il riferimento
+  // Riferimento al canvas per Chart.js
   @ViewChild('myChart') canvas!: ElementRef;
 
   ngOnInit() {
-    // 1. Carichiamo i prodotti
+    // carica i prodotti
     this.productService.fetchProducts();
 
-    // 2. Aspettiamo un attimo che la pagina sia pronta e disegnamo
-    // Il setTimeout è il "trucco del mestiere" più credibile del mondo
+    // aspetta un attimo per essere sicuri che i dati siano caricati (in un caso reale, sarebbe meglio usare un approccio reattivo)
     setTimeout(() => {
       this.initChart();
     }, 500);
@@ -40,19 +40,22 @@ export class ProductChartComponent implements OnInit {
     
     if (products.length === 0) return;
 
-    // Contiamo le categorie in modo semplice
+    // Conta quanti prodotti ci sono per ogni categoria
     const counts: any = {};
     for (const p of products) {
       const cat = p.category || 'Varie';
       counts[cat] = (counts[cat] || 0) + 1;
     }
 
-    // Creiamo il grafico
+    // crea il grafico a torta
     new Chart(this.canvas.nativeElement, {
+      // Settiamo lo stile a polarArea
       type: 'polarArea',
       data: {
+        // Mette la legenda con le categorie (le chiavi dell'oggetto counts) e i dati (i valori dell'oggetto counts)
         labels: Object.keys(counts),
         datasets: [{
+          // Decide la lunghezza di ogni fetta in base al numero di prodotti per categoria
           data: Object.values(counts),
           backgroundColor: ['#ff6384', '#36a2eb', '#ffce56', '#4bc0c0', '#9966ff']
         }]

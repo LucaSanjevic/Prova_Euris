@@ -26,28 +26,29 @@ describe('ProductCard', () => {
     fixture.detectChanges();
   });
 
-  it('dovrebbe mostrare il titolo del prodotto nel template', () => {
+  it('should display the product title in the template', () => {
     const compiled = fixture.nativeElement as HTMLElement;
-    // Cerchiamo il testo nel titolo della card
+    // Controlla che il titolo del prodotto sia presente nel template
     expect(compiled.querySelector('.card-title')?.textContent).toContain('Prodotto Test');
   });
 
-  it('dovrebbe emettere l\'evento di eliminazione al click (senza spyOn)', () => {
-    let idEmesso: string | undefined;
+  it('should emit the delete event on click', () => {
+    let emittedId: string | undefined;
 
+    // Subscribe all'evento delete per catturare l'id emesso
     component.delete.subscribe((id: string) => {
-      idEmesso = id;
+      emittedId = id;
     });
 
-    // Cerchiamo il bottone
-    const button = fixture.nativeElement.querySelector('.text-danger'); 
-    
-    // Verifichiamo che il bottone esista prima di cliccare
-    expect(button).toBeTruthy(); 
-    
+    // Prende il pulsante di eliminazione dal template
+    const button = fixture.nativeElement.querySelector('.text-danger');
+
+    // Verifica che il pulsante esista prima di cliccarlo
+    expect(button).toBeTruthy();
+
     // Se button esiste (non è null), clicchiamo
     button?.click();
 
-    expect(idEmesso).toBe('1');
+    expect(emittedId).toBe('1');
   });
 });

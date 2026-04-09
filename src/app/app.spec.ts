@@ -1,34 +1,27 @@
-import { TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { App } from './app';
-import { provideRouter } from '@angular/router';
+import { RouterTestingModule } from '@angular/router/testing';
 
 describe('App', () => {
+  let component: App;
+  let fixture: ComponentFixture<App>;
+
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [App],
-      providers: [provideRouter([])]
-    }).overrideComponent(App, {
-    set: { templateUrl: '', template: '<router-outlet></router-outlet>', styleUrls: [] }
-  })
-    .compileComponents();
+      imports: [App, RouterTestingModule],
+    }).compileComponents();
+
+    fixture = TestBed.createComponent(App);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
   });
 
   it('should create the app', () => {
-    const fixture = TestBed.createComponent(App);
-    const app = fixture.componentInstance;
-    expect(app).toBeTruthy();
+    expect(component).toBeTruthy();
   });
 
- it('should render title', () => {
-  const fixture = TestBed.createComponent(App);
-  fixture.detectChanges();
-  const compiled = fixture.nativeElement as HTMLElement;
-  
-  // Usiamo il textContent dell'intero componente se il selettore specifico fallisce
-  const content = compiled.textContent || '';
-  expect(content).toBeDefined(); 
-  // Oppure, se vuoi essere specifico, assicurati che il mock abbia quella classe:
-});
-
-
+  it('should have the correct title signal value', () => {
+    // Essendo un signal, lo chiamiamo con le parentesi ()
+    expect(component['title']()).toEqual('euris_test');
+  });
 });

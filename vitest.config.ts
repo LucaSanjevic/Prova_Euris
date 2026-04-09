@@ -1,12 +1,16 @@
 import { defineConfig } from 'vitest/config';
-import angular from '@analogjs/vite-plugin-angular'; // AGGIUNGI QUESTO
 
 export default defineConfig({
-  plugins: [angular()], // ATTIVA IL PLUGIN QUI
   test: {
     globals: true,
     environment: 'jsdom',
-    setupFiles: ['./src/test-setup.ts'],
-    include: ['src/**/*.spec.ts'],
+    setupFiles: ['src/test-setup.ts'],
+    server: {
+      deps: {
+        inline: [/runtime/], // Se 'inline' fallisce qui, prova a rimuoverlo del tutto
+      },
+    },
+    // Se usi i file .html e .scss esterni, Vitest ha bisogno di trasformarli
+    css: true,
   },
 });

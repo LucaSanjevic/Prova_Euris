@@ -1,1 +1,8 @@
-/* You can add global styles to this file, and also import other style files */
+app-product-card .card {
+  border: 1px solid #9e9e9e !important;
+}
+
+// Se le card sono dentro un contenitore specifico (es. dashboard)
+.grid-container .card {
+  border-color: #000000; // Nero netto per un look moderno
+}

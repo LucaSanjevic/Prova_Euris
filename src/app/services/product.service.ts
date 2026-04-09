@@ -9,7 +9,7 @@ export class ProductService {
   private readonly _baseUrl = 'https://us-central1-test-b7665.cloudfunctions.net/api';
   private readonly _storeId = 'ijpxNJLM732vm8AeajMR';
 
-  // Costruiamo l'URL base per i prodotti di questo store
+  // URL per l'API dei prodotti
   private readonly apiUrl = `${this._baseUrl}/stores/${this._storeId}/products`;
 
   private _products = signal<Product[]>([]);
@@ -22,65 +22,67 @@ export class ProductService {
   public readonly currentPage = this._currentPage.asReadonly();
   public readonly totalElements = this._totalElements.asReadonly();
 
-  fetchProducts(page: number = 0): void {
-  this._isLoading.set(true);
-  
-  // Proviamo a non inviare parametri per ora, visto che il server crasha con ?page=1
-  // Se vuoi riprovare la paginazione in futuro, usa .set('page', '0')
-  
-  this._http.get<any>(this.apiUrl).subscribe({
-    next: (response) => {
-      // Firebase restituisce spesso i dati direttamente o in una proprietà
-      const rawProducts = Array.isArray(response) ? response : (response.products || []);
-      
-      const sanitizedData = rawProducts.map((item: any) => {
-        // Estraiamo i campi da 'data' (struttura Firebase) o dall'item stesso
-        const fields = item.data || item;
-        
-        return {
-          ...fields,
-          id: item.id || fields.id || `legacy-${crypto.randomUUID()}`,
-          reviews: fields.reviews || []
-        } as Product;
-      });
+  public fetchProducts(page: number = 0): void {
+    this._isLoading.set(true);
 
-      this._products.set(sanitizedData);
-      
-      // Se l'API non manda il totale, contiamo quelli che abbiamo
-      this._totalElements.set(response.total || sanitizedData.length);
-      this._currentPage.set(page);
-      this._isLoading.set(false);
-    },
-    error: (err) => {
-      console.error('Errore fetch:', err);
-      this._isLoading.set(false);
-      // Opzionale: alert('Il server ha risposto con errore 500');
-    }
-  });
-}
+    this._http.get<any>(this.apiUrl).subscribe({
+      next: (response) => {
+        // L'API potrebbe restituire un array diretto o un oggetto con chiave 'products'
+        const rawProducts = Array.isArray(response) ? response : response.products || [];
 
+        const sanitizedData = rawProducts.map((item: any) => {
+          // Se l'item ha una struttura { data: { ... } }, estraiamo i campi da 'data'
+          const fields = item.data || item;
+
+          // Ritorna un oggetto Product
+          return {
+            ...fields,
+            // Se l'ID è presente, si usa quello; altrimenti, si genera un ID unico
+            id: item.id || fields.id || `legacy-${crypto.randomUUID()}`,
+            reviews: fields.reviews || [],
+          } as Product;
+        });
+
+        this._products.set(sanitizedData);
+
+        this._totalElements.set(response.total || sanitizedData.length);
+        this._currentPage.set(page);
+        this._isLoading.set(false);
+      },
+      error: (err) => {
+        console.error('Errore fetch:', err);
+        this._isLoading.set(false);
+      },
+    });
+  }
+
+  // Aggiunge un nuovo prodotto e aggiorna lo stato locale
   public addProduct(payload: any): Observable<Product> {
-    // Il payload arriva già nel formato { data: { ... } } dal componente
-    return this._http.post(this.apiUrl, payload, { responseType: 'text' }).pipe( 
+    // Post invia i dati ad apiUrl
+    // L'oggetto avrà come responseType 'text' che rappresenta l'ID del nuovo prodotto creato
+    // Restituisce un Observable che mappa l'ID ricevuto in un oggetto Product completo, unendo i dati inviati con l'ID restituito
+    return this._http.post(this.apiUrl, payload, { responseType: 'text' }).pipe(
       map((newId: string) => {
         return {
           id: newId,
-          ...payload.data
+          ...payload.data,
         } as Product;
       }),
+      // Si aggiorna this._products aggiungendo il nuovo prodotto all'inizio dell'array
       tap((newProduct) => {
         this._products.update((current) => [newProduct, ...current]);
-      })
+      }),
     );
   }
 
+  // Elimina un prodotto dato il suo ID e aggiorna lo stato locale
   public deleteProduct(productId: string): Observable<string> {
     const url = `${this.apiUrl}/${productId}`;
-    
+
     return this._http.delete(url, { responseType: 'text' }).pipe(
       tap(() => {
-        this._products.update((current) => current.filter(p => p.id !== productId));
-      })
+        this._products.update((current) => current.filter((p) => p.id !== productId));
+      }),
     );
   }
 }

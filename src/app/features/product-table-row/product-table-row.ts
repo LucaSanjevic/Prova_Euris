@@ -53,22 +53,4 @@ export class ProductTableRowComponent {
   @Output() delete = new EventEmitter<string>();
   @Output() viewReviews = new EventEmitter<string[]>();
 
-  handleDelete(event: Event) {
-    event.preventDefault();
-    event.stopPropagation();
-    
-    // Cerchiamo l'ID ovunque sia
-    const finalId = this.item.id || (this.item as any).data?.id;
-    
-    console.log('Click su riga:', this.item.title || (this.item as any).data?.title);
-    console.log('ID trovato:', finalId);
-
-    if (finalId) {
-      this.delete.emit(finalId);
-    } else {
-      console.error('ERRORE: Questo prodotto non ha un ID, non posso eliminarlo!');
-      // Se vuoi eliminarlo comunque (per pulizia), emetti una stringa finta
-      // this.delete.emit('missing-id');
-    }
-  }
 }

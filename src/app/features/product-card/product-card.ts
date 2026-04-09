@@ -17,19 +17,35 @@ import { Product } from '../../models/product.model';
         Gestito da: {{ item.employee }}
       </div>
       <div class="position-absolute top-0 end-0 p-2">
-        <button class="btn btn-light btn-sm shadow-sm text-danger" (click)="delete.emit(item.id)">
+        <button class="btn btn-light btn-sm shadow-sm text-danger" (click)="onDelete($event)">
           <i class="bi bi-trash3"></i>
         </button>
-        <button class="btn btn-sm btn-outline-info me-2" 
-        (click)="viewReviews.emit(item.reviews)">
-  <i class="bi bi-chat-left-text"></i> ({{ item.reviews.length || 0 }})
-</button>
+        <button class="btn btn-sm btn-outline-info shadow-sm" 
+        data-bs-toggle="modal" 
+        data-bs-target="#reviewModal"
+        (click)="onViewReviews($event)">
+          <i class="bi bi-chat-left-text"></i> ({{ item.reviews.length }})
+        </button>
       </div>
     </div>
   `
 })
 export class ProductCardComponent {
-  @Input({ required: true }) item!: Product;
+ @Input({ required: true }) item!: Product;
   @Output() delete = new EventEmitter<string>();
   @Output() viewReviews = new EventEmitter<string[]>();
+
+  // Funzione per gestire la visualizzazione delle recensioni senza propagazione
+  onViewReviews(event: Event) {
+    // Ferma la propagazione del click per evitare di attivare altri eventi indesiderati
+    event.stopPropagation(); 
+    this.viewReviews.emit(this.item.reviews);
+  }
+
+  // Funzione per gestire l'eliminazione senza propagazione
+  onDelete(event: Event) {
+    // Ferma la propagazione del click per evitare di attivare altri eventi indesiderati
+    event.stopPropagation();
+    this.delete.emit(this.item.id);
+  }
 }
