@@ -32,9 +32,9 @@ import { ReviewModalComponent } from '../review-modal/review-modal';
     <div class="text-center py-5"><div class="spinner-border text-primary"></div></div>
   } @else {
     @if (isTableView()) {
-      <div class="table-responsive card shadow-sm border-0">
+      <div class="table-responsive card shadow-sm border-1">
         <table class="table table-hover align-middle mb-0">
-          <thead class="table-light">
+          <thead class="table-secondary">
             <tr>
               <th>Nome</th>
               <th>Categoria</th>

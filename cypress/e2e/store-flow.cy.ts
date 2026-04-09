@@ -41,7 +41,8 @@ describe('Store User Journey', () => {
       // cancella testi pre-esistenti
       .clear()
       // scrive un testo
-      .type('Torta di mele')
+      .invoke('val', 'Torta di mele')
+      .trigger('input')
       // forza Angular a validare il campo
       .trigger('blur');
 
@@ -79,48 +80,50 @@ describe('Store User Journey', () => {
 
 
     // REVIEWS
+    // clicca sull'icona della chat del primo prodotto
     cy.get('app-product-card').first().find('.bi-chat-left-text').click();
+    // verifica che il modal delle recensioni sia visibile
     cy.get('#reviewModal').should('be.visible').and('have.class', 'show');
 
-    cy.wait(500); // Attesa per stabilità animazione
+    cy.wait(500);
 
-    // 1. Prova a chiudere con ESC
+    // Prova a chiudere con ESC
     cy.get('body').type('{esc}');
 
-    // 2. Controlliamo se il modal è ancora lì. Se sì, proviamo il click forzato.
+    // 
     cy.get('body').then(($body: JQuery<HTMLElement>) => {
-      // Cerchiamo il modal. Se ha ancora la classe 'show', allora ESC non ha funzionato
+      // Cerca il modal. Se ha ancora la classe 'show', allora ESC non ha funzionato
       const modal = $body.find('#reviewModal.show');
 
+      // Se il modal è ancora presente, clicca sul bottone di chiusura
       if (modal.length > 0) {
-        // Usiamo cy.wrap per tornare nel contesto Cypress solo se necessario
         cy.wrap(modal).find('.btn-close, button').filter(':visible').first().click({ force: true });
       }
     });
 
-    // 3. Aspettiamo che il "velo" grigio sparisca (fondamentale per i punti successivi)
+    // Aspettiamo che il modal si chiuda
     cy.get('.modal-backdrop', { timeout: 10000 }).should('not.exist');
     cy.get('#reviewModal').should('not.have.class', 'show');
 
-    // --- 5. PAGINAZIONE ---
-    cy.contains('Pagina 0').should('be.visible');
-    cy.get('button').contains('Successiva').click();
+    // PAGINAZIONE
+    // Verifica che siamo sulla pagina 1
     cy.contains('Pagina 1').should('be.visible');
+    // Clicca su Successiva
+    cy.get('button').contains('Successiva').click();
+    // Verifica che siamo sulla pagina 2
+    cy.contains('Pagina 2').should('be.visible');
 
-    // --- 6. ELIMINAZIONE ---
+    // DELETE
+    // Intercetta la finestra di conferma e accettala automaticamente
     cy.on('window:confirm' as any, () => true);
 
     // Clicca sul cestino
     cy.get('.bi-trash3').first().click();
 
-    // Aspettiamo che la chiamata DELETE finisca e la lista si aggiorni
-    // Questo assicura che lo screenshot finale sia sulla pagina pulita
     cy.wait(1000);
+
+    // Verifica che il prodotto sia stato rimosso (controlla che non ci siano più product card, o che ce ne siano meno di prima)
     cy.get('app-product-card').should('be.visible');
 
-    cy.log('Complimenti! Il flusso è completo e verificato.');
-
-    // Verifica che il prodotto non sia più visibile (opzionale)
-    // cy.contains('Prodotto Cypress Test').should('not.exist');
   });
 });

@@ -9,7 +9,7 @@ import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm mb-4">
       <div class="container">
         <a class="navbar-brand fw-bold" routerLink="/">
-          <i class="bi bi-box-seam me-2"></i>Euris Store
+          <i class="bi bi-shop me-2"></i>Negozio di dolci
         </a>
         
         <div class="navbar-nav ms-auto flex-row gap-3">

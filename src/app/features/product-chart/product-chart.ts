@@ -17,11 +17,11 @@ Chart.register(...registerables);
         </div>
       </div>
     </div>
-  `
+  `,
 })
 export class ProductChartComponent implements OnInit {
   private productService = inject(ProductService);
-  
+
   // Riferimento al canvas per Chart.js
   @ViewChild('myChart') canvas!: ElementRef;
 
@@ -37,7 +37,7 @@ export class ProductChartComponent implements OnInit {
 
   initChart() {
     const products = this.productService.products();
-    
+
     if (products.length === 0) return;
 
     // Conta quanti prodotti ci sono per ogni categoria
@@ -54,16 +54,34 @@ export class ProductChartComponent implements OnInit {
       data: {
         // Mette la legenda con le categorie (le chiavi dell'oggetto counts) e i dati (i valori dell'oggetto counts)
         labels: Object.keys(counts),
-        datasets: [{
-          // Decide la lunghezza di ogni fetta in base al numero di prodotti per categoria
-          data: Object.values(counts),
-          backgroundColor: ['#ff6384', '#36a2eb', '#ffce56', '#4bc0c0', '#9966ff']
-        }]
+        datasets: [
+          {
+            // Decide la lunghezza di ogni fetta in base al numero di prodotti per categoria
+            data: Object.values(counts),
+            backgroundColor: [
+              '#FF6384',
+              '#36A2EB',
+              '#FFCE56',
+              '#4BC0C0',
+              '#9966FF',
+              '#FF9F40',
+              '#C9CBCF',
+              '#4D5360',
+              '#8BC34A',
+              '#E91E63',
+              '#00BCD4',
+              '#FFEB3B',
+              '#9C27B0',
+              '#795548',
+              '#607D8B',
+            ],
+          },
+        ],
       },
       options: {
         responsive: true,
-        maintainAspectRatio: false
-      }
+        maintainAspectRatio: false,
+      },
     });
   }
 }
