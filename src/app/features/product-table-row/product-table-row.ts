@@ -30,7 +30,7 @@ template: `
     <td class="text-center">
       <div class="d-flex justify-content-center gap-2">
         <button 
-          class="btn btn-outline-info btn-sm border-0" 
+          class="btn btn-outline-info btn-sm border-0 d-inline-flex align-items-center" 
           (click)="viewReviews.emit(item.reviews || $any(item).data?.reviews)"
           data-bs-toggle="modal" 
           data-bs-target="#reviewModal">
