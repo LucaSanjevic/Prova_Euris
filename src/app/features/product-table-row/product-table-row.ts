@@ -41,6 +41,14 @@ template: `
         </button>
 
         <button 
+  class="btn btn-outline-warning btn-sm border-0" 
+  (click)="edit.emit(item)"
+  data-bs-toggle="modal" 
+  data-bs-target="#productModal">
+  <i class="bi bi-pencil-square"></i>
+</button>
+
+        <button 
           class="btn btn-outline-danger btn-sm border-0" 
           (click)="delete.emit(item.id || $any(item).data?.id)"> <i class="bi bi-trash3"></i>
         </button>
@@ -52,5 +60,6 @@ export class ProductTableRowComponent {
   @Input({ required: true }) item!: Product;
   @Output() delete = new EventEmitter<string>();
   @Output() viewReviews = new EventEmitter<string[]>();
+  @Output() edit = new EventEmitter<Product>();
 
 }

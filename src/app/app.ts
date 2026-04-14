@@ -1,5 +1,6 @@
-import { Component, signal } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
+import { ToastService } from './services/toast';
 
 @Component({
   selector: 'app-root',
@@ -31,6 +32,22 @@ import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
       <router-outlet></router-outlet>
     </main>
 
+    <div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 1100">
+      @for (toast of toastService.toasts(); track $index) {
+        <div class="toast show align-items-center text-white border-0 mb-2" 
+             [class.bg-success]="toast.type === 'success'"
+             [class.bg-danger]="toast.type === 'danger'"
+             role="alert">
+          <div class="d-flex">
+            <div class="toast-body">
+              <i class="bi" [class.bi-check-circle]="toast.type === 'success'" [class.bi-exclamation-triangle]="toast.type === 'danger'"></i>
+              {{ toast.message }}
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+    
     <style>
       .nav-link { color: rgba(255,255,255,0.8); }
       .nav-link.active { color: #fff !important; }
@@ -40,4 +57,5 @@ import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
 })
 export class App {
   protected readonly title = signal('euris_test');
+  protected readonly toastService = inject(ToastService);
 }

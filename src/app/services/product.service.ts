@@ -1,7 +1,9 @@
-import { Injectable, signal, inject } from '@angular/core';
+import { Injectable, signal, inject, computed } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Product } from '../models/product.model';
-import { Observable, map, tap } from 'rxjs';
+import { Observable, map, of, tap } from 'rxjs';
+import { ToastService } from './toast';
+
 
 @Injectable({ providedIn: 'root' })
 export class ProductService {
@@ -16,45 +18,60 @@ export class ProductService {
   private _isLoading = signal<boolean>(false);
   private _currentPage = signal<number>(1);
   private _totalElements = signal<number>(0);
+  public readonly searchTerm = signal<string>('');
 
   public readonly products = this._products.asReadonly();
   public readonly isLoading = this._isLoading.asReadonly();
   public readonly currentPage = this._currentPage.asReadonly();
   public readonly totalElements = this._totalElements.asReadonly();
+  private readonly _toastService = inject(ToastService);
 
-  public fetchProducts(page: number = 0): void {
-    this._isLoading.set(true);
 
-    this._http.get<any>(this.apiUrl).subscribe({
-      next: (response) => {
-        // L'API potrebbe restituire un array diretto o un oggetto con chiave 'products'
-        const rawProducts = Array.isArray(response) ? response : response.products || [];
+  // computed che filtra i prodotti in base al searchTerm, cercando sia nel titolo che nella categoria
+  public readonly filteredProducts = computed(() => {
+  const term = this.searchTerm().toLowerCase();
+  const allProducts = this.products();
+  if (!term) return allProducts;
+  return allProducts.filter(p => 
+    p.title.toLowerCase().includes(term) || 
+    p.category?.toLowerCase().includes(term)
+  );
+});
 
-        const sanitizedData = rawProducts.map((item: any) => {
-          // Se l'item ha una struttura { data: { ... } }, estraiamo i campi da 'data'
-          const fields = item.data || item;
+  public fetchProducts(): void {
+    // Imposta isLoading a true prima di iniziare la richiesta
+  this._isLoading.set(true);
+  this._http.get<any>(this.apiUrl).subscribe({
+    next: (res) => {
+      // La risposta potrebbe essere un array di prodotti o un oggetto con una proprietà "products"
+      const raw = Array.isArray(res) ? res : res.products || [];
+      const sanitized = raw.map((item: any) => {
+        // se l'item ha una proprietà "data", usala come base, altrimenti usa l'item stesso
+        const d = item.data || item;
+        // crea un nuovo Product sovrascrivendo id e reviews se non sono presenti
+        return {
+          ...d,
+          id: item.id || d.id,
+          reviews: d.reviews || []
+        } as Product;
+      });
+      // aggiorna _products con la lista sanificata e imposta isLoading a false
+      this._products.set(sanitized);
+      this._isLoading.set(false);
+    },
+    error: () => this._isLoading.set(false)
+  });
+}
 
-          // Ritorna un oggetto Product
-          return {
-            ...fields,
-            // Se l'ID è presente, si usa quello; altrimenti, si genera un ID unico
-            id: item.id || fields.id || `legacy-${crypto.randomUUID()}`,
-            reviews: fields.reviews || [],
-          } as Product;
-        });
-
-        this._products.set(sanitizedData);
-
-        this._totalElements.set(response.total || sanitizedData.length);
-        this._currentPage.set(page);
-        this._isLoading.set(false);
-      },
-      error: (err) => {
-        console.error('Errore fetch:', err);
-        this._isLoading.set(false);
-      },
-    });
-  }
+public updateProduct(productId: string, payload: any): Observable<void> {
+  this._products.update(list => 
+    // se l'id del prodotto corrisponde a productId, crea un nuovo oggetto unendo il prodotto esistente con i nuovi dati, altrimenti mantieni il prodotto invariato
+    list.map(p => p.id === productId ? { ...p, ...payload.data } : p)
+  );
+  // Mostra un toast di conferma
+  this._toastService.show('Modifica salvata localmente', 'info');
+  return of(void 0);
+}
 
   // Aggiunge un nuovo prodotto e aggiorna lo stato locale
   public addProduct(payload: any): Observable<Product> {
@@ -85,4 +102,6 @@ export class ProductService {
       }),
     );
   }
+
+
 }
