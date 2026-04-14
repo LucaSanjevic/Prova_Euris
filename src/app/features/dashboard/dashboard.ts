@@ -168,16 +168,22 @@ export class Dashboard implements OnInit {
     this._productService.fetchProducts();
   }
 
-  // Metodo per aggiungere un prodotto
+  // Metodo per aggiungere un prodotto (payload contiene i dati del prodotto da aggiungere o modificare, emessi dal ProductFormComponent)
 protected onAddProduct(payload: any): void { 
   const currentProduct = this.selectedProduct();
   
   if (currentProduct) {
-    this._productService.updateProduct(currentProduct.id!, payload).subscribe();
+    this._productService.updateProduct(currentProduct.id!, payload).subscribe({
+      next: () => {
+        this._productService.fetchProducts(); 
+        this._toastService.show('Prodotto aggiornato!', 'success');
+      }
+    });
   } else {
-    this._productService.addProduct(payload).subscribe();
+    this._productService.addProduct(payload).subscribe({
+      next: () => this._productService.fetchProducts()
+    });
   }
-  
   this.selectedProduct.set(null);
 }
 
@@ -202,10 +208,11 @@ protected onAddProduct(payload: any): void {
     return this._productService.filteredProducts().slice(start, start + pageSize);
   });
 
-  // Metodo che modifica il searchTerm del service quando l'utente digita nella barra di ricerca, e resetta la pagina a 1
+  // Metodo che modifica il searchTerm del service quando l'utente digita nella barra di ricerca
   protected updateSearch(event: Event): void {
     const target = event.target as HTMLInputElement;
     this._productService.searchTerm.set(target.value);
+    // resetta la pagina a 1
     (this._productService as any)._currentPage.set(1);
   }
 

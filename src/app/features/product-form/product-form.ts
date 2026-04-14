@@ -98,7 +98,9 @@ import { Product } from '../../models/product.model';
 })
 export class ProductFormComponent {
   private readonly _fb = inject(FormBuilder);
+  // crea una proprietà di input che può essere un oggetto Product o null, usata per precompilare il form quando si modifica un prodotto esistente
   @Input() productToEdit: Product | null = null;
+  // crea un evento di output chiamato "submitted" che emette un oggetto con una proprietà "data" di tipo Product quando il form viene salvato
   @Output() submitted = new EventEmitter<{ data: Product }>();
 
   // Lista centralizzata delle categorie
@@ -130,6 +132,7 @@ export class ProductFormComponent {
     }
   }
 
+  // Metodo chiamato quando si clicca su "Salva Prodotto"
   protected onSave(): void {
     if (this.productForm.valid) {
       // 

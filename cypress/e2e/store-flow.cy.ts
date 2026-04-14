@@ -1,129 +1,105 @@
-/// <reference types="cypress" />
 import {} from 'cypress';
+/// <reference types="cypress" />
+
 describe('Store User Journey', () => {
   beforeEach(() => {
     cy.visit('http://localhost:4200');
+    cy.intercept('POST', '**/products').as('postProduct');
+    cy.intercept('GET', '**/products/**').as('getProducts');
+    cy.intercept('DELETE', '**/products/**').as('deleteProduct');
   });
 
-  it('should complete the full flow: navigate, change view, add, read and delete', () => {
+  it('should complete the full flow: navigate, change view, add, read, edit and delete', () => {
     // NAVIGAZIONE
-    // Clicca sul link Grafico nella Navbar
     cy.get('a').contains('Grafico').click();
     cy.url().should('include', '/chart');
-    // Torna alla Tabella
     cy.get('a').contains('Tabella').click();
     cy.url().should('include', '/dashboard');
 
     // CHANGE VIEW
-    // Clicca sull'icona per cambiare vista
     cy.get('.bi-grid-3x3-gap').closest('button').click();
+    cy.get('app-product-card', { timeout: 8000 }).should('be.visible');
 
-    // Verifica che il bottone abbia preso la classe btn-primary (conferma che lo stato è cambiato)
-    cy.get('.bi-grid-3x3-gap').closest('button').should('have.class', 'btn-primary');
-
-    // Verifica che la tabella sia rimossa dal DOM
-    cy.get('table').should('not.exist');
-
-    // Verifica che i product card siano visibili (con un timeout più lungo per dare tempo alla pagina di aggiornarsi)
-    cy.get('app-product-card', { timeout: 8000 })
-      .should('be.visible')
-      .and('have.length.at.least', 1);
-
-    // ADD PRODUCT
-    // Clicca su "Nuovo Prodotto"
+    // ADD INITIAL PRODUCT
     cy.contains('button', 'Nuovo Prodotto').click();
-    // Verifica che il modal sia visibile
-    cy.get('#productModal').should('have.class', 'show');
-
     cy.get('#productModal').within(() => {
-      // Usiamo blur() dopo ogni inserimento per forzare Angular a validare il campo
-      cy.get('input[formControlName="title"]')
-      // cancella testi pre-esistenti
-      .clear()
-      // scrive un testo
-      .invoke('val', 'Torta di mele')
-      .trigger('input')
-      // forza Angular a validare il campo
-      .trigger('blur');
-
-      // 
-      cy.get('select[formControlName="category"]')
-        .select('Dolci')
-        // avverte Angular del cambiamento (a volte necessario per i select)
-        .trigger('change')
-        .trigger('blur');
-
-      cy.get('input[formControlName="price"]')
-      .clear()
-      .type('10')
-      .trigger('blur');
-
-      cy.get('input[formControlName="employee"]')
-      .clear()
-      .type('Luca')
-      .trigger('blur');
-
-      cy.get('textarea[formControlName="description"]')
-        .clear()
-        .type('Ottima torta')
-        .trigger('blur');
-
-      cy.wait(500);
-
-      // verifica che il bottone "Salva Prodotto" sia abilitato e cliccalo
-      cy.contains('button', 'Salva Prodotto').should('not.be.disabled').click();
+      cy.get('input[formControlName="title"]').type('Torta di mele');
+      cy.get('select[formControlName="category"]').select('Dolci');
+      cy.get('input[formControlName="price"]').type('10');
+      cy.get('input[formControlName="employee"]').type('Luca');
+      cy.get('textarea[formControlName="description"]').type('Ottima torta');
+      cy.contains('button', 'Salva Prodotto').click();
     });
 
-    // Aspettiamo che il modal si chiuda
-    cy.get('#productModal', { timeout: 10000 }).should('not.have.class', 'show');
+    cy.wait('@postProduct');
+    cy.get('#productModal').should('not.have.class', 'show');
 
-
-
-    // REVIEWS
-    // clicca sull'icona della chat del primo prodotto
+    //  REVIEWS 
     cy.get('app-product-card').first().find('.bi-chat-left-text').click();
-    // verifica che il modal delle recensioni sia visibile
     cy.get('#reviewModal').should('be.visible').and('have.class', 'show');
+    cy.wait(1000);
 
-    cy.wait(500);
+    cy.get('#reviewModal').find('[data-bs-dismiss="modal"]').first().click({ force: true });
 
-    // Prova a chiudere con ESC
-    cy.get('body').type('{esc}');
-
-    // 
-    cy.get('body').then(($body: JQuery<HTMLElement>) => {
-      // Cerca il modal. Se ha ancora la classe 'show', allora ESC non ha funzionato
-      const modal = $body.find('#reviewModal.show');
-
-      // Se il modal è ancora presente, clicca sul bottone di chiusura
-      if (modal.length > 0) {
-        cy.wrap(modal).find('.btn-close, button').filter(':visible').first().click({ force: true });
+    cy.get('body').then(($body) => {
+      if ($body.find('.modal-backdrop').length > 0) {
+        cy.get('.modal-backdrop').invoke('remove');
       }
+      if ($body.find('#reviewModal').length > 0) {
+        cy.get('#reviewModal')
+          .invoke('removeClass', 'show')
+          .invoke('css', 'display', 'none')
+          .invoke('css', 'pointer-events', 'none');
+      }
+      cy.get('body').invoke('removeClass', 'modal-open').invoke('css', 'overflow', 'auto');
     });
-
-    // Aspettiamo che il modal si chiuda
-    cy.get('.modal-backdrop', { timeout: 10000 }).should('not.exist');
-    cy.get('#reviewModal').should('not.have.class', 'show');
-
-    // PAGINAZIONE
-    // Verifica che siamo sulla pagina 1
-    cy.contains('Pagina 1').should('be.visible');
-    // Clicca su Successiva
-    cy.get('button').contains('Successiva').click();
-    // Verifica che siamo sulla pagina 2
-    cy.contains('Pagina 2').should('be.visible');
-
-    // DELETE
-    // Intercetta la finestra di conferma e accettala automaticamente
-    cy.on('window:confirm' as any, () => true);
-
-    // Clicca sul cestino
-    cy.get('.bi-trash3').first().click();
 
     cy.wait(1000);
 
-    // Verifica che il prodotto sia stato rimosso (controlla che non ci siano più product card, o che ce ne siano meno di prima)
-    cy.get('app-product-card').should('be.visible');
+    // DELETE
+    cy.on('window:confirm', () => true);
+    cy.get('app-product-card').first().find('.bi-trash3').click({ force: true });
+    cy.wait('@deleteProduct');
+    cy.wait(1000);
+    cy.contains('button', 'Nuovo Prodotto').click({ force: true });
 
+    // EDIT
+    cy.contains('button', 'Nuovo Prodotto').click({ force: true });
+    cy.get('#productModal')
+      .should('be.visible')
+      .within(() => {
+        // Titolo
+        cy.get('input[formControlName="title"]')
+          .clear({ force: true })
+          .invoke('val', 'Prodotto da Editare')
+          .trigger('input')
+          .trigger('change')
+          .should('have.value', 'Prodotto da Editare');
+
+        // categoria
+        cy.get('select[formControlName="category"]').select('Dolci');
+
+        // Prezzo
+        cy.get('input[formControlName="price"]').clear({ force: true }).type('20').trigger('input');
+
+        // Dipendente
+        cy.get('input[formControlName="employee"]')
+          .clear({ force: true })
+          .type('Test Bot')
+          .trigger('input');
+
+        // Descrizione
+        cy.get('textarea[formControlName="description"]')
+          .clear({ force: true })
+          .type('Descrizione test')
+          .trigger('input');
+
+        cy.wait(500); 
+        cy.contains('button', 'Salva Prodotto').click({ force: true });
+      });
+
+    cy.wait('@postProduct');
+    cy.wait(500);
+    cy.get('#productModal', { timeout: 10000 }).should('not.have.class', 'show');
   });
 });

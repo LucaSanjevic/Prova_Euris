@@ -46,6 +46,7 @@ export class ProductCardComponent {
   onDelete(event: Event) {
     // Ferma la propagazione del click per evitare di attivare altri eventi indesiderati
     event.stopPropagation();
+    // emette l'evento di eliminazione con l'ID del prodotto
     this.delete.emit(this.item.id);
   }
 }
