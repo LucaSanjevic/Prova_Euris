@@ -60,13 +60,6 @@ describe('Store User Journey', () => {
 
     cy.wait(1000);
 
-    // DELETE
-    cy.on('window:confirm', () => true);
-    cy.get('app-product-card').first().find('.bi-trash3').click({ force: true });
-    cy.wait('@deleteProduct');
-    cy.wait(1000);
-    cy.contains('button', 'Nuovo Prodotto').click({ force: true });
-
     // EDIT
     cy.contains('button', 'Nuovo Prodotto').click({ force: true });
     cy.get('#productModal')
@@ -81,7 +74,9 @@ describe('Store User Journey', () => {
           .should('have.value', 'Prodotto da Editare');
 
         // Categoria
-        cy.get('select[formControlName="category"]').select('Dolci');
+        cy.get('select[formControlName="category"]', { timeout: 10000 })
+  .should('be.visible')
+  .select('Dolci');
 
         // Prezzo
         cy.get('input[formControlName="price"]').clear({ force: true }).type('20').trigger('input');
@@ -105,5 +100,13 @@ describe('Store User Journey', () => {
     cy.wait('@postProduct');
     cy.wait(500);
     cy.get('#productModal', { timeout: 10000 }).should('not.have.class', 'show');
+  
+  
+  // DELETE
+    cy.on('window:confirm', () => true);
+    cy.get('app-product-card').first().find('.bi-trash3').click({ force: true });
+    cy.wait('@deleteProduct');
+    cy.wait(1000);
+  
   });
 });
