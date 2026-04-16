@@ -76,14 +76,16 @@ export class ProductService {
   // Aggiunge un nuovo prodotto e aggiorna lo stato locale
   // Nel ProductService
 public addProduct(payload: any): Observable<Product> {
-  // INVIO payload.data invece di payload
+  // Chiamata POST
   return this._http.post(this.apiUrl, payload.data, { responseType: 'text' }).pipe(
     map((newId: string) => {
+      // Crea un nuovo prodotto combinando l'ID restituito dall'API con i dati inviati
       return {
         id: newId,
         ...payload.data,
       } as Product;
     }),
+    // Aggiorna lo stato locale aggiungendo il nuovo prodotto all'inizio della lista
     tap((newProduct) => {
       this._products.update((current) => [newProduct, ...current]);
     }),

@@ -8,7 +8,7 @@ import { Product } from '../../models/product.model';
   template: `
     <div class="card h-100 shadow-sm border-0 position-relative">
       <div class="card-body">
-        <span class="badge bg-light text-primary mb-2">{{
+        <span class="badge bg-light text-dark border mb-2">{{
           item.category || 'Nessuna categoria'
         }}</span>
         <h5 class="card-title fw-bold text-truncate">{{ item.title || 'Senza titolo' }}</h5>
