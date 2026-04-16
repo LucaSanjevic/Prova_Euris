@@ -33,22 +33,17 @@ describe('ProductCard', () => {
   });
 
   it('should emit the delete event on click', () => {
-    let emittedId: string | undefined;
+  let emittedId: string | undefined;
+  // Sottoscrivi all'evento delete per catturare l'id emesso
+  component.delete.subscribe((id) => (emittedId = id));
+  // Seleziona il pulsante di eliminazione
+  const deleteBtn = fixture.nativeElement.querySelector('.btn-outline-danger');
+  // Controlla che il pulsante esista prima di cliccarlo
+  expect(deleteBtn).not.toBeNull();
+  // Clicca sul pulsante di eliminazione
+  deleteBtn.click();
+  // Verifica che l'id emesso corrisponda all'id del prodotto
+  expect(emittedId).toBe(component.item.id);
+});
 
-    // Subscribe all'evento delete per catturare l'id emesso
-    component.delete.subscribe((id: string) => {
-      emittedId = id;
-    });
-
-    // Prende il pulsante di eliminazione dal template
-    const button = fixture.nativeElement.querySelector('.text-danger');
-
-    // Verifica che il pulsante esista prima di cliccarlo
-    expect(button).toBeTruthy();
-
-    // Se button esiste (non è null), clicchiamo
-    button?.click();
-
-    expect(emittedId).toBe('1');
-  });
 });
