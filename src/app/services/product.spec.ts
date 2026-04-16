@@ -25,7 +25,7 @@ describe('ProductService', () => {
 
   // Test per la mappatura dei dati
   it('should map data correctly', () => {
-    // Dati di test che simulano la risposta del server
+    // Mock che simula la risposta del server
     const mockResponse = [
       { id: '1', data: { title: 'Test Prodotto', price: 10 } }
     ];
@@ -34,7 +34,7 @@ describe('ProductService', () => {
     service.fetchProducts();
     // Controlla che la richiesta sia stata fatta all'URL corretto
     const req = httpMock.expectOne(apiUrl);
-    // Simula la risposta del server con i dati di test e sblocca next() dell'observable
+    // Sblocca la chiamata fetchProducts con il mockResponse, che attiverà la mappatura dei dati e l'aggiornamento del signal
     req.flush(mockResponse);
 
     // Verifica che i dati siano stati mappati correttamente nel signal
@@ -70,7 +70,7 @@ describe('ProductService', () => {
     const req = httpMock.expectOne(`${apiUrl}/${productId}`);
     // Verifichiamo che la richiesta sia di tipo DELETE
     expect(req.request.method).toBe('DELETE');
-    // Sblocchiamo la chiamata deleteProduct simulando una risposta di successo, che attiverà l'aggiornamento del signal
+    // Sblocca la chiamata deleteProduct simulando una risposta di successo, che attiverà l'aggiornamento del signal
     req.flush('Deleted successfully'); 
 
     // Verifichiamo che il prodotto sia stato rimosso dal signal

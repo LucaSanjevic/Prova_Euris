@@ -21,7 +21,6 @@ describe('App', () => {
   });
 
   it('should have the correct title signal value', () => {
-    // Essendo un signal, lo chiamiamo con le parentesi ()
     expect(component['title']()).toEqual('euris_test');
   });
 });

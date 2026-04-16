@@ -8,7 +8,9 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
 
   return next(req).pipe(
     catchError((error: HttpErrorResponse) => {
+      // se c'è un problema di rete (status 0) o se l'errore è un ProgressEvent, lo si gestisce in modo specifico
       if (error.status === 0 && error.error instanceof ProgressEvent) {
+        // getta l'errore evitando di mostrare il toast
          return throwError(() => error);
       }
 

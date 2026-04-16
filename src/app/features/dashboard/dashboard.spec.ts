@@ -20,7 +20,7 @@ describe('Dashboard', () => {
     fixture.detectChanges();
   });
 
-  it('dovrebbe popolare i prodotti e coprire il rendering (Righe 124-167)', () => {
+  it('should fill products', () => {
     const mockProducts = [
       { id: '1', title: 'Test 1', price: 10, category: 'A', reviews: [] },
       { id: '2', title: 'Test 2', price: 20, category: 'B', reviews: ['Ottimo'] }
@@ -32,7 +32,7 @@ describe('Dashboard', () => {
     
     fixture.detectChanges();
 
-    // Verific che i prodotti siano stati popolati correttamente
+    // Verifica che i prodotti siano stati popolati correttamente
     expect(component['products']().length).toBe(2);
   });
 
@@ -48,7 +48,7 @@ describe('Dashboard', () => {
     expect(component['selectedReviews']()).toEqual(testReviews);
   });
 
-  it('should execute onDelete without confirmation (ID validation branch)', () => {
+  it('should execute onDelete without confirmation', () => {
     // Mock dell'alert per evitare l'effettiva visualizzazione durante il test
     window.alert = () => {}; 
 
@@ -58,7 +58,7 @@ describe('Dashboard', () => {
     expect(true).toBe(true);
   });
 
-  it('dovrebbe gestire il cambio pagina', () => {
+  it('should change page', () => {
   // crea un array di prodotti finti
   const mockProducts = new Array(15).fill({ id: 'test' });
   (service as any)._products.set(mockProducts);

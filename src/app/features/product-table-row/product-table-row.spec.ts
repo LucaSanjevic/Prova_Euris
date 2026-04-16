@@ -10,12 +10,12 @@ describe('ProductTableRowComponent', () => {
       imports: [ProductTableRowComponent]
     }).compileComponents();
 
-    // Creiamo il componente e impostiamo un prodotto di test
+    // Crea il componente e imposta un prodotto di test
     fixture = TestBed.createComponent(ProductTableRowComponent);
-    // Otteniamo l'istanza del componente
+    // Instanza del componente
     component = fixture.componentInstance;
     
-    // Mock del prodotto (usiamo la struttura che il tuo codice si aspetta)
+    // Mock del prodotto
     component.item = { 
       id: 'ID_TEST_123', 
       title: 'Prodotto Test'
@@ -37,7 +37,7 @@ describe('ProductTableRowComponent', () => {
     // Simula il click sul pulsante per visualizzare le recensioni
     component.viewReviews.emit(component.item.reviews);
 
-    // Verifichiamo che le recensioni emesse siano quelle attese
+    // Verifica che le recensioni emesse siano quelle attese
     expect(emittedReviews).toEqual(mockReviews);
   });
 });

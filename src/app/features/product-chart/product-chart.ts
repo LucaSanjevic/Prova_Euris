@@ -26,10 +26,10 @@ export class ProductChartComponent implements OnInit {
   @ViewChild('myChart') canvas!: ElementRef;
 
   ngOnInit() {
-    // carica i prodotti
+    // Carica i prodotti
     this.productService.fetchProducts();
 
-    // aspetta un attimo per essere sicuri che i dati siano caricati (in un caso reale, sarebbe meglio usare un approccio reattivo)
+    // aspetta un attimo per essere sicuri che i dati siano caricati
     setTimeout(() => {
       this.initChart();
     }, 500);
@@ -47,9 +47,9 @@ export class ProductChartComponent implements OnInit {
       counts[cat] = (counts[cat] || 0) + 1;
     }
 
-    // crea il grafico a torta
+    // Crea il grafico a torta
     new Chart(this.canvas.nativeElement, {
-      // Settiamo lo stile a polarArea
+      // Setta lo stile a polarArea
       type: 'polarArea',
       data: {
         // Mette la legenda con le categorie (le chiavi dell'oggetto counts) e i dati (i valori dell'oggetto counts)

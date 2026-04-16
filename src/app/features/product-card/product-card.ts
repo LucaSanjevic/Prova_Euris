@@ -8,7 +8,9 @@ import { Product } from '../../models/product.model';
   template: `
     <div class="card h-100 shadow-sm border-0 position-relative">
       <div class="card-body">
-        <span class="badge bg-light text-primary mb-2">{{ item.category || 'Nessuna categoria' }}</span>
+        <span class="badge bg-light text-primary mb-2">{{
+          item.category || 'Nessuna categoria'
+        }}</span>
         <h5 class="card-title fw-bold text-truncate">{{ item.title || 'Senza titolo' }}</h5>
         <p class="fs-4 fw-bold text-success">{{ item.price ? item.price + '€' : 'n.d.' }}</p>
         <p class="card-text text-muted small text-truncate-2">{{ item.description }}</p>
@@ -17,28 +19,40 @@ import { Product } from '../../models/product.model';
         Gestito da: {{ item.employee }}
       </div>
       <div class="position-absolute top-0 end-0 p-2">
-        <button class="btn btn-light btn-sm shadow-sm text-danger" (click)="onDelete($event)">
+        <button
+          class="btn btn-outline-info btn-sm border-0"
+          data-bs-toggle="modal"
+          data-bs-target="#reviewModal"
+          (click)="onViewReviews($event)"
+        >
+          <i class="bi bi-chat-left-text"></i> ({{ item.reviews.length }})
+        </button>
+        <button class="btn btn-outline-danger btn-sm border-0" (click)="onDelete($event)">
           <i class="bi bi-trash3"></i>
         </button>
-        <button class="btn btn-sm btn-outline-info shadow-sm" 
-        data-bs-toggle="modal" 
-        data-bs-target="#reviewModal"
-        (click)="onViewReviews($event)">
-          <i class="bi bi-chat-left-text"></i> ({{ item.reviews.length }})
+        <button
+          class="btn btn-outline-primary btn-sm border-0"
+          data-bs-toggle="modal"
+          data-bs-target="#productModal"
+          (click)="onEdit($event)"
+        >
+          <i class="bi bi-pencil-square"></i>
         </button>
       </div>
     </div>
-  `
+  `,
 })
 export class ProductCardComponent {
- @Input({ required: true }) item!: Product;
+  @Input({ required: true }) item!: Product;
   @Output() delete = new EventEmitter<string>();
   @Output() viewReviews = new EventEmitter<string[]>();
+  @Output() edit = new EventEmitter<Product>();
 
   // Funzione per gestire la visualizzazione delle recensioni senza propagazione
   onViewReviews(event: Event) {
     // Ferma la propagazione del click per evitare di attivare altri eventi indesiderati
-    event.stopPropagation(); 
+    event.stopPropagation();
+    // Emette verso dashboard le recensioni
     this.viewReviews.emit(this.item.reviews);
   }
 
@@ -48,5 +62,10 @@ export class ProductCardComponent {
     event.stopPropagation();
     // emette l'evento di eliminazione con l'ID del prodotto
     this.delete.emit(this.item.id);
+  }
+
+  onEdit(event: Event) {
+    event.stopPropagation();
+    this.edit.emit(this.item); // Emittiamo l'intero prodotto per riempire il form
   }
 }

@@ -47,10 +47,14 @@ describe('Store User Journey', () => {
       }
       if ($body.find('#reviewModal').length > 0) {
         cy.get('#reviewModal')
+        // Prima rimuove la classe 'show' per nascondere il modal
           .invoke('removeClass', 'show')
+          // Poi imposta display a 'none' e pointer-events a 'none' per assicurarsi che sia completamente nascosto e non interagibile
           .invoke('css', 'display', 'none')
+          // Rimuove anche pointer-events per evitare che il modal, se ancora presente nel DOM, possa interferire con i click sottostanti
           .invoke('css', 'pointer-events', 'none');
       }
+      // Rimuove la classe 'modal-open' dal body e ripristina l'overflow per assicurarsi che la pagina torni alla normalità dopo la chiusura del modal
       cy.get('body').invoke('removeClass', 'modal-open').invoke('css', 'overflow', 'auto');
     });
 
@@ -76,7 +80,7 @@ describe('Store User Journey', () => {
           .trigger('change')
           .should('have.value', 'Prodotto da Editare');
 
-        // categoria
+        // Categoria
         cy.get('select[formControlName="category"]').select('Dolci');
 
         // Prezzo

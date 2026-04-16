@@ -28,32 +28,33 @@ template: `
     </td>
     
     <td class="text-center">
-      <div class="d-flex justify-content-center gap-2">
-        <button 
-          class="btn btn-outline-info btn-sm border-0 d-inline-flex align-items-center" 
-          (click)="viewReviews.emit(item.reviews || $any(item).data?.reviews)"
-          data-bs-toggle="modal" 
-          data-bs-target="#reviewModal">
-          <i class="bi bi-chat-left-text"></i>
-          <span class="ms-1 small">
-            {{ (item.reviews || $any(item).data?.reviews)?.length || 0 }}
-          </span>
-        </button>
+  <div class="d-flex justify-content-center gap-2">
+    <button 
+      class="btn btn-outline-info btn-sm border-0 d-inline-flex align-items-center" 
+      (click)="viewReviews.emit(item.reviews || $any(item).data?.reviews)"
+      data-bs-toggle="modal" 
+      data-bs-target="#reviewModal">
+      <i class="bi bi-chat-left-text"></i>
+      <span class="ms-1 small">
+        {{ (item.reviews || $any(item).data?.reviews)?.length || 0 }}
+      </span>
+    </button>
 
-        <button 
-  class="btn btn-outline-warning btn-sm border-0" 
-  (click)="edit.emit(item)"
-  data-bs-toggle="modal" 
-  data-bs-target="#productModal">
-  <i class="bi bi-pencil-square"></i>
-</button>
+    <button 
+      class="btn btn-outline-primary btn-sm border-0" 
+      (click)="edit.emit(item)"
+      data-bs-toggle="modal" 
+      data-bs-target="#productModal">
+      <i class="bi bi-pencil-square"></i>
+    </button>
 
-        <button 
-          class="btn btn-outline-danger btn-sm border-0" 
-          (click)="delete.emit(item.id || $any(item).data?.id)"> <i class="bi bi-trash3"></i>
-        </button>
-      </div>
-    </td>
+    <button 
+      class="btn btn-outline-danger btn-sm border-0" 
+      (click)="delete.emit(item.id || $any(item).data?.id)"> 
+      <i class="bi bi-trash3"></i>
+    </button>
+  </div>
+</td>
 `
 })
 export class ProductTableRowComponent {

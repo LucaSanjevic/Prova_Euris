@@ -4,7 +4,6 @@ import { Product } from '../models/product.model';
 import { Observable, map, of, tap } from 'rxjs';
 import { ToastService } from './toast';
 
-
 @Injectable({ providedIn: 'root' })
 export class ProductService {
   private readonly _http = inject(HttpClient);
@@ -14,72 +13,73 @@ export class ProductService {
   // URL per l'API dei prodotti
   private readonly apiUrl = `${this._baseUrl}/stores/${this._storeId}/products`;
 
+  // Signal che contiene la lista dei prodotti
   private _products = signal<Product[]>([]);
+  // Signal che indica se i prodotti sono in fase di caricamento
   private _isLoading = signal<boolean>(false);
+  // Signal che tiene traccia della pagina corrente per la paginazione
   private _currentPage = signal<number>(1);
-  private _totalElements = signal<number>(0);
+  // Signal che contiene il termine di ricerca per filtrare i prodotti
   public readonly searchTerm = signal<string>('');
 
+  // si rendono i signal leggibili dall'esterno, ma non modificabili direttamente
   public readonly products = this._products.asReadonly();
   public readonly isLoading = this._isLoading.asReadonly();
   public readonly currentPage = this._currentPage.asReadonly();
-  public readonly totalElements = this._totalElements.asReadonly();
-  private readonly _toastService = inject(ToastService);
 
-
-  // computed che filtra i prodotti in base al searchTerm, cercando sia nel titolo che nella categoria
+  // Computed che filtra i prodotti in base al searchTerm, cercando sia nel titolo che nella categoria
   public readonly filteredProducts = computed(() => {
-  const term = this.searchTerm().toLowerCase();
-  const allProducts = this.products();
-  if (!term) return allProducts;
-  return allProducts.filter(p => 
-    p.title.toLowerCase().includes(term) || 
-    p.category?.toLowerCase().includes(term)
-  );
-});
-
-  public fetchProducts(): void {
-    // Imposta isLoading a true prima di iniziare la richiesta
-  this._isLoading.set(true);
-  this._http.get<any>(this.apiUrl).subscribe({
-    next: (res) => {
-      // La risposta potrebbe essere un array di prodotti o un oggetto con una proprietà "products"
-      const raw = Array.isArray(res) ? res : res.products || [];
-      const sanitized = raw.map((item: any) => {
-        // se l'item ha una proprietà "data", usala come base, altrimenti usa l'item stesso
-        const d = item.data || item;
-        // crea un nuovo Product sovrascrivendo id e reviews se non sono presenti
-        return {
-          ...d,
-          id: item.id || d.id,
-          reviews: d.reviews || []
-        } as Product;
-      });
-      // aggiorna _products con la lista sanificata e imposta isLoading a false
-      this._products.set(sanitized);
-      this._isLoading.set(false);
-    },
-    error: () => this._isLoading.set(false)
+    const term = this.searchTerm().toLowerCase();
+    const allProducts = this.products();
+    if (!term) return allProducts;
+    return allProducts.filter(
+      (p) => p.title.toLowerCase().includes(term) || p.category?.toLowerCase().includes(term),
+    );
   });
-}
 
-public updateProduct(productId: string, payload: any): Observable<void> {
-  this._products.update(list => 
-    // se l'id del prodotto corrisponde a productId, crea un nuovo oggetto unendo il prodotto esistente con i nuovi dati, altrimenti mantieni il prodotto invariato
-    list.map(p => p.id === productId ? { ...p, ...payload.data } : p)
-  );
-  // Mostra un toast di conferma
-  this._toastService.show('Modifica salvata localmente', 'info');
-  return of(void 0);
-}
+  // Funzione per recuperare i prodotti dall'API e aggiornare lo stato locale
+  public fetchProducts(): void {
+    // Imposta isLoading a true
+    this._isLoading.set(true);
+    // Richiesta GET
+    this._http.get<any>(this.apiUrl).subscribe({
+      next: (res) => {
+        // Se res è un array lo prende direttamente, altrimenti cerca la proprietà "products"
+        const raw = Array.isArray(res) ? res : res.products || [];
+        const sanitized = raw.map((item: any) => {
+          // Se l'item ha una proprietà "data" si usa quella altrimenti l'item stesso
+          const d = item.data || item;
+          // Crea un nuovo Product sovrascrivendo id e reviews se non sono presenti
+          return {
+            ...d,
+            id: item.id || d.id,
+            reviews: d.reviews || [],
+          } as Product;
+        });
+        // Aggiorna _products e imposta isLoading a false
+        this._products.set(sanitized);
+        this._isLoading.set(false);
+      },
+      error: () => this._isLoading.set(false),
+    });
+  }
+
+  public updateProduct(productId: string, payload: any): Observable<void> {
+    this._products.update((list) =>
+      // Trova l'id uguale a productId e crea un nuovo oggetto unendo il prodotto esistente con i nuovi dati
+      list.map((p) => (p.id === productId ? { ...p, ...payload.data } : p)),
+    );
+    // Restituisce un Observable che emette void, indicando che l'operazione è completata
+    return of(void 0);
+  }
 
   // Aggiunge un nuovo prodotto e aggiorna lo stato locale
   public addProduct(payload: any): Observable<Product> {
-    // Post invia i dati ad apiUrl
+    // Fa una richiesta POST
     // L'oggetto avrà come responseType 'text' che rappresenta l'ID del nuovo prodotto creato
-    // Restituisce un Observable che mappa l'ID ricevuto in un oggetto Product completo, unendo i dati inviati con l'ID restituito
     return this._http.post(this.apiUrl, payload, { responseType: 'text' }).pipe(
       map((newId: string) => {
+        // Crea un nuovo prodotto unendo l'ID restituito dall'API con i dati del form
         return {
           id: newId,
           ...payload.data,
@@ -95,13 +95,11 @@ public updateProduct(productId: string, payload: any): Observable<void> {
   // Elimina un prodotto dato il suo ID e aggiorna lo stato locale
   public deleteProduct(productId: string): Observable<string> {
     const url = `${this.apiUrl}/${productId}`;
-
+    // Fa una richiesta DELETE
     return this._http.delete(url, { responseType: 'text' }).pipe(
       tap(() => {
         this._products.update((current) => current.filter((p) => p.id !== productId));
       }),
     );
   }
-
-
 }
