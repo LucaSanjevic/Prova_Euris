@@ -15,10 +15,10 @@ export class ToastService {
     // Dichiara un nuovo toast con il messaggio e il tipo specificati
     const newToast = { message, type };
     // Aggiunge il nuovo toast alla lista dei toast attivi
-    this.toasts.update(t => [...t, newToast]);
+    this.toasts.update((t) => [...t, newToast]);
     // Rimuove il toast dopo 3 secondi
     setTimeout(() => {
-      this.toasts.update(t => t.filter(x => x !== newToast));
+      this.toasts.update((t) => t.filter((x) => x !== newToast));
     }, 3000);
   }
 }

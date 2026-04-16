@@ -34,7 +34,7 @@ describe('Store User Journey', () => {
     cy.wait('@postProduct');
     cy.get('#productModal').should('not.have.class', 'show');
 
-    //  REVIEWS 
+    //  REVIEWS
     cy.get('app-product-card').first().find('.bi-chat-left-text').click();
     cy.get('#reviewModal').should('be.visible').and('have.class', 'show');
     cy.wait(1000);
@@ -47,7 +47,7 @@ describe('Store User Journey', () => {
       }
       if ($body.find('#reviewModal').length > 0) {
         cy.get('#reviewModal')
-        // Prima rimuove la classe 'show' per nascondere il modal
+          // Prima rimuove la classe 'show' per nascondere il modal
           .invoke('removeClass', 'show')
           // Poi imposta display a 'none' e pointer-events a 'none' per assicurarsi che sia completamente nascosto e non interagibile
           .invoke('css', 'display', 'none')
@@ -98,7 +98,7 @@ describe('Store User Journey', () => {
           .type('Descrizione test')
           .trigger('input');
 
-        cy.wait(500); 
+        cy.wait(500);
         cy.contains('button', 'Salva Prodotto').click({ force: true });
       });
 

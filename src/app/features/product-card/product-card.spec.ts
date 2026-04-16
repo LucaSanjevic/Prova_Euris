@@ -21,7 +21,7 @@ describe('ProductCard', () => {
       category: 'Bevande',
       description: 'Descrizione test',
       employee: 'Mario',
-      reviews: []
+      reviews: [],
     };
     fixture.detectChanges();
   });
@@ -33,17 +33,16 @@ describe('ProductCard', () => {
   });
 
   it('should emit the delete event on click', () => {
-  let emittedId: string | undefined;
-  // Sottoscrivi all'evento delete per catturare l'id emesso
-  component.delete.subscribe((id) => (emittedId = id));
-  // Seleziona il pulsante di eliminazione
-  const deleteBtn = fixture.nativeElement.querySelector('.btn-outline-danger');
-  // Controlla che il pulsante esista prima di cliccarlo
-  expect(deleteBtn).not.toBeNull();
-  // Clicca sul pulsante di eliminazione
-  deleteBtn.click();
-  // Verifica che l'id emesso corrisponda all'id del prodotto
-  expect(emittedId).toBe(component.item.id);
-});
-
+    let emittedId: string | undefined;
+    // Sottoscrivi all'evento delete per catturare l'id emesso
+    component.delete.subscribe((id) => (emittedId = id));
+    // Seleziona il pulsante di eliminazione
+    const deleteBtn = fixture.nativeElement.querySelector('.btn-outline-danger');
+    // Controlla che il pulsante esista prima di cliccarlo
+    expect(deleteBtn).not.toBeNull();
+    // Clicca sul pulsante di eliminazione
+    deleteBtn.click();
+    // Verifica che l'id emesso corrisponda all'id del prodotto
+    expect(emittedId).toBe(component.item.id);
+  });
 });
