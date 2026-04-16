@@ -23,12 +23,12 @@ template: `
       {{ item.employee || $any(item).data?.employee || 'Admin' }}
     </td>
     
-    <td class="text-end fw-bold text-success">
+    <td class="fw-bold text-success">
       {{ item.price || $any(item).data?.price }}€
     </td>
     
     <td class="text-center">
-  <div class="d-flex justify-content-center gap-2">
+  <div class="d-flex justify-content-center">
     <button 
       class="btn btn-outline-info btn-sm border-0 d-inline-flex align-items-center" 
       (click)="viewReviews.emit(item.reviews || $any(item).data?.reviews)"

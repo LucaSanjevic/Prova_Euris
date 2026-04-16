@@ -97,6 +97,7 @@ import { ToastService } from '../../services/toast';
                   [item]="product"
                   (delete)="onDelete($event)"
                   (edit)="selectedProduct.set($event)"
+                  (viewReviews)="openReviews($event)"
                 ></tr>
               }
             </tbody>
@@ -228,6 +229,8 @@ export class Dashboard implements OnInit {
 
     if (newPage >= 1 && newPage <= maxPage) {
       (this._productService as any)._currentPage.set(newPage);
+      // Scrolla in alto quando si cambia pagina
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   }
 
